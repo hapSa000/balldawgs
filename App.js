@@ -5,7 +5,7 @@ import RootStack from './src/navigation/RootStack';
 import FlashMessage from 'react-native-flash-message';
 import {AuthContext} from './context/context';
 export default function App() {
-
+  console.log('Hello Git Setup');
   const [state, dispatch] = useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -23,22 +23,19 @@ export default function App() {
 
   const authContext = useMemo(
     () => ({
-      addToCartItemQTY: async (itemCount) => {
+      addToCartItemQTY: async itemCount => {
         console.log('itemCount---', itemCount);
         await AsyncStorage.setItem('CartItemCount', itemCount.toString());
         dispatch({type: 'ADD_TO_CART_ITEM_QTY', itemCount: itemCount});
       },
-
     }),
     [],
   );
-
 
   return (
     <AuthContext.Provider value={authContext}>
       <RootStack />
       <FlashMessage position="top" animated hideOnPress autoHide />
-      </AuthContext.Provider>
-
+    </AuthContext.Provider>
   );
 }
