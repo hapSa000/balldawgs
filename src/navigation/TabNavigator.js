@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import navigationStrings from '../utils/navigationStrings';
@@ -42,9 +41,11 @@ export default function TabNavigator() {
         tabBarInactiveTintColor: 'gray',
         labelStyle: {paddingBottom: 10, fontSize: 10},
         tabBarItemStyle: {
-          padding: 5, height: 55, backgroundColor:'#C2C2C2'
-        }
-      })} >
+          padding: 5,
+          height: 55,
+          backgroundColor: '#C2C2C2',
+        },
+      })}>
       <Tab.Screen
         name={navigationStrings.HOME_STACK}
         component={HomeStack}

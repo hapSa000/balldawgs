@@ -19,7 +19,7 @@ export default function ShopStack() {
         name={navigationStrings.PRODUCT_DETAILS_SCREEN}
         component={ProductDetailsScreen}
       />
-       <ShopStackNavigator.Screen
+      <ShopStackNavigator.Screen
         name={navigationStrings.CarouselFullImagePinchable}
         component={CarouselFullImagePinchable}
       />
@@ -27,8 +27,6 @@ export default function ShopStack() {
         name={navigationStrings.CART_SCREEN}
         component={CartScreen}
       />
-
-
     </ShopStackNavigator.Navigator>
   );
 }

@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootStack from './src/navigation/RootStack';
 import FlashMessage from 'react-native-flash-message';
 import {AuthContext} from './context/context';
+import AuthStack from './src/navigation/AuthStack';
+import {NavigationContainer} from '@react-navigation/native';
 export default function App() {
   console.log('Hello Git Setup');
   const [state, dispatch] = useReducer(
@@ -34,7 +36,10 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContext}>
-      <RootStack />
+      <NavigationContainer>
+        <RootStack />
+      </NavigationContainer>
+
       <FlashMessage position="top" animated hideOnPress autoHide />
     </AuthContext.Provider>
   );

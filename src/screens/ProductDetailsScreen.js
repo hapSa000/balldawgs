@@ -135,7 +135,7 @@ export default function ProductDetailsScreen(props) {
       <Header hideLogin={true} title={'Product Details'} rightIcon={true}/>
 
       <View style={tw`h-full bg-[#fff]`}>
-          <ScrollView  >
+          <ScrollView>
           <View style={{}}>
             <Carousel
               layout="default"

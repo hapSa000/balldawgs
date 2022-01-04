@@ -17,7 +17,7 @@ import NetworkRequest, {
   servicesPoints,
   method,
 } from '../services/NetworkRequest';
-
+import Feather from 'react-native-vector-icons/Feather';
 import tw from '../../lib/tailwind';
 import Logo from '../../assets/images/logo.png';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -25,31 +25,78 @@ import Container from '../components/Container';
 import navigationStrings from '../utils/navigationStrings';
 export default function ProfileScreen({navigation}) {
 
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setLoading] = useState(false);
+  const [others, setOthers] = useState('');
+  const [activeEdit, setActiveEdit] = useState(false);
+  const [userData, setUserData] = useState({});
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getMyProfile();
+    });
+    return unsubscribe;
+  }, [navigation]);
+  const getMyProfile = async () => {
+    try {
+      const requestConfig = {
+        method: method.get,
+        url: servicesPoints.userServices.getProfileData,
+      };
+
+      const response = await NetworkRequest(requestConfig);
+      if (response) {
+        const status = response.status;
+        if (status == 'success') {
+          console.log('res success of my profile', response.data);
+          setLoading(false);
+          setUserData(response.data.profile);
+          setFirstName(response.data.profile.firstName);
+          setLastName(response.data.profile.lastName);
+          setEmailAddress(response.data.profile.email);
+          setOthers(response.data.profile.other);
+        } else {
+          setLoading(false);
+          Toast('Error', response.message, 'danger', 'danger');
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false);
+      Toast('Error', error.message, 'danger', 'danger');
+    }
+  };
+
+  const onEditProfile =  () => {
+    setActiveEdit(true);
+  }
 
   const onSubmit = async () => {
    try {
+    if (!firstName) {
+      Toast('Error', 'Please enter first name', 'danger', 'danger');
+      return;
+    }
+    if (!lastName) {
+      Toast('Error', 'Please enter last name', 'danger', 'danger');
+      return;
+    }
       if (!emailAddress) {
         Toast('Error', 'Please enter email address', 'danger', 'danger');
         return;
       }
-      if (!password) {
-        Toast('Error', 'Please enter password', 'danger', 'danger');
-        return;
-      }
-      if (password.length != 8) {
-        Toast('Error', 'password should be minimum 8 digit character & alpha numeric only.', 'danger', 'danger');
+      if (!others) {
+        Toast('Error', 'Please enter others', 'danger', 'danger');
         return;
       }
       let condition =
-          emailAddress && password;
+      firstName && lastName && emailAddress && others;
       if (condition) {
 
-         await onApiLogin();
+         await onApiUpdatePutProfile();
       }
 
    } catch (error) {
@@ -58,28 +105,30 @@ export default function ProfileScreen({navigation}) {
   };
 
 
-  const onApiLogin = async () => {
+  const onApiUpdatePutProfile = async () => {
     let data ={
+      "firstName": firstName,
+      "lastName": lastName,
       "email": emailAddress,
-      "password":password
+      "other":others
   }
     try {
       setLoading(true);
 
       const requestConfig = {
-        method: method.post,
-        url: servicesPoints.userServices.loginApi,
+        method: method.put,
+        url: servicesPoints.userServices.getProfileData,
         data: data,
       };
       const response = await NetworkRequest(requestConfig);
-      console.log('response from server', response);
+      console.log('response from server onApiUpdatePutProfile', response);
       if (response) {
         const status = response.status;
         if (status == 'success') {
           console.log('res success', response);
           setLoading(false);
           await saveProfileWithUserToken(response.data);
-          Toast('Success', 'user login successfully.', 'success', 'success');
+          Toast('Success', 'profile updated successfully.', 'success', 'success');
           navigation.navigate(navigationStrings.HOME_SCREEN)
         } else {
           console.log('res failure', response);
@@ -89,6 +138,8 @@ export default function ProfileScreen({navigation}) {
       }
     } catch (error) {
       console.log(error.message);
+      setLoading(false);
+      Toast('Error',error.message, 'danger', 'danger');
     }
   };
 
@@ -111,7 +162,7 @@ export default function ProfileScreen({navigation}) {
   }
   return (
     <Container>
-     <Header hideLogin={true} title={'My Account'} />
+     <Header hideLogin={true} title={activeEdit ? 'Edit Profile' :'My Account'} />
       <ScrollView style={tw`h-full w-full`}>
       <View style={tw`mx-1`}>
       <View
@@ -131,14 +182,22 @@ export default function ProfileScreen({navigation}) {
           }}
         />
       </View>
+
       <Text
         style={{textAlign:'center',margin:20}}>
-        gMangal
+        {userData?.username}
       </Text>
+      <TouchableOpacity   onPress={onEditProfile}>
+      <Text
+        style={{textAlign:'center',marginTop:3,marginBottom:3, color:'#000',fontWeight:'700',fontSize:16}}>
+        Edit Profile
+      </Text>
+      </TouchableOpacity>
     </View>
 
         <View style={tw`mt-4`}>
           <TextInput
+          editable={activeEdit}
             keyboardType={'default'}
             placeholder={'First Name:'}
             placeholderTextColor={tw`bg-gray-200`}
@@ -158,6 +217,7 @@ export default function ProfileScreen({navigation}) {
         </View>
         <View style={tw`mt-4`}>
           <TextInput
+          editable={activeEdit}
             keyboardType={'default'}
             placeholder={'Last Name:'}
             placeholderTextColor={tw`bg-gray-200`}
@@ -177,12 +237,14 @@ export default function ProfileScreen({navigation}) {
         </View>
         <View style={tw`mt-6`}>
           <TextInput
+            editable={false}
             keyboardType={'email-address'}
             placeholder={'Email ID:'}
             placeholderTextColor={tw`bg-gray-200`}
             style={tw.style(
               `mx-auto w-80 px-6 py-4 rounded-full bg-white shadow-md`,
               {
+                backgroundColor:'#ccc',
                 shadowOffset: {width: 2, height: 5},
                 shadowColor: `#000`,
                 shadowRadius: 1,
@@ -196,9 +258,9 @@ export default function ProfileScreen({navigation}) {
         </View>
         <View style={tw`mt-6`}>
           <TextInput
+           editable={activeEdit}
             keyboardType={'default'}
             placeholder={'Others'}
-            secureTextEntry={true}
             placeholderTextColor={tw`bg-gray-200`}
             style={tw.style(
               `mx-auto w-80 px-6 py-4 rounded-full bg-white shadow-md`,
@@ -210,20 +272,23 @@ export default function ProfileScreen({navigation}) {
                 elevation: 3,
               },
             )}
-            value={password}
-            onChangeText={password => setPassword(password)}
+            value={others}
+            onChangeText={others => setOthers(others)}
           />
         </View>
 
 
 
-        <TouchableOpacity
+       {
+         activeEdit ?
+         <TouchableOpacity
          onPress={() => onSubmit()}
           style={tw`mx-auto w-80 px-6 py-4 border mt-20 bg-black`}>
           <Text style={tw`text-white text-xl font-bold mx-auto `}>
             Submit
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>:null
+       }
 
 
       </ScrollView>

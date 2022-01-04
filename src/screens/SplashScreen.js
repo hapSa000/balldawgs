@@ -35,7 +35,7 @@ export default function SplashScreen({navigation}) {
     setTimeout(() => {
       // setPauseVideo(false)
       // setPlayVideo(true);
-       navigation.dispatch(StackActions.replace(navigationStrings.TAB_NAVIGATOR));
+      //  navigation.dispatch(StackActions.replace(navigationStrings.TAB_NAVIGATOR));
     }, 3000);
   }, [playVideo]);
 

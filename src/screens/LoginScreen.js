@@ -28,6 +28,26 @@ export default function Login({navigation}) {
   const [password, setPassword] = useState('');
   const [isLoading, setLoading] = useState(false);
 
+  const [apiToken, setApiToken] = useState(null);
+
+
+  useEffect(() => {
+    const setTokenAsync = async () => {
+      try {
+        await AsyncStorage.setItem('apiToken','');
+
+        var apiTokenCheck = await AsyncStorage.getItem('apiToken');
+        console.log('apiToken updated login', apiTokenCheck);
+
+      } catch (e) {
+      }
+    };
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      setTokenAsync();
+    });
+  });
+
   const onSubmit = async () => {
    try {
       if (!emailAddress) {
@@ -86,6 +106,7 @@ export default function Login({navigation}) {
       }
     } catch (error) {
       console.log(error.message);
+      setLoading(false);
     }
   };
 

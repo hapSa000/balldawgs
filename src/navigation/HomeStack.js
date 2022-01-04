@@ -1,62 +1,41 @@
 import React from 'react';
+import {View, Text, Alert} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import navigationStrings from '../utils/navigationStrings';
 import HomeScreen from '../screens/HomeScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ForgotPassword from '../screens/ForgotPassword';
-import ProfileScreen from '../screens/ProfileScreen';
 
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 const Drawer = createDrawerNavigator();
 
+function LogoutNavigator() {
+  Alert.alert(
+    'Log out',
+    'Do you want to logout?',
+    [
+      {
+        text: 'Cancel',
+        onPress: () => {
+          return null;
+        },
+      },
+      {text: 'Confirm', onPress: () => {}},
+    ],
+    {cancelable: false},
+  );
+
+  return null;
+}
+const Stack = createNativeStackNavigator();
 export default function HomeStack() {
   return (
-    <Drawer.Navigator screenOptions={{headerShown: false}}>
-      <Drawer.Screen
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName={navigationStrings.HOME_SCREEN}>
+      <Stack.Screen
+        options={{headerShown: false}}
         name={navigationStrings.HOME_SCREEN}
         component={HomeScreen}
-        options={{
-          title: 'Home',
-          drawerItemStyle:{height: 0}
-        }}
-
       />
-
-<Drawer.Screen
-        name={'Profile'}
-        component={ProfileScreen}
-        options={{
-          title: 'My Account',
-          drawerItemStyle:{height: 60,backgroundColor:'#eee',justifyContent:'center',alignContent:'center',borderColor:'#aaa',borderRadius:10}
-        }}
-      />
-
-
-      <Drawer.Screen
-        name={navigationStrings.LOGIN_SCREEN}
-        component={LoginScreen}
-        options={{
-          title: 'Logout',
-          drawerItemStyle:{height: 60,backgroundColor:'#eee',justifyContent:'center',alignContent:'center',borderColor:'#aaa',borderRadius:10}
-        }}
-      />
-      <Drawer.Screen
-        name={navigationStrings.REGISTER_SCREEN}
-        component={RegisterScreen}
-        options={{
-          title: 'Register',
-          drawerItemStyle:{height: 0}
-        }}
-      />
-       <Drawer.Screen
-        name={navigationStrings.FORGOT_SCREEN}
-        component={ForgotPassword}
-        options={{
-          title: 'Forgot Password',
-          drawerItemStyle:{height: 0}
-        }}
-      />
-
-    </Drawer.Navigator>
+    </Stack.Navigator>
   );
 }
